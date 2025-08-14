@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
@@ -17,12 +18,19 @@ class ZadTvApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        brightness: Brightness.dark,
+        brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF007749), // subtle deep green
-          brightness: Brightness.dark,
+          seedColor: const Color(0xFF007BFF), // Techspance blue
+          brightness: Brightness.light,
         ),
-        scaffoldBackgroundColor: const Color(0xFF001C13),
+        textTheme: TextTheme(
+          headlineMedium: GoogleFonts.roboto(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          bodyMedium: GoogleFonts.openSans(color: Colors.white70),
+        ),
+        // scaffoldBackgroundColor: const Color(0xFF007BFF),
       ),
       home: const LivePage(),
     );
@@ -37,35 +45,23 @@ class LivePage extends StatefulWidget {
 }
 
 class _LivePageState extends State<LivePage> {
-  /// Zad TV live video ID from your link:
-  /// https://www.youtube.com/live/9nXHHtalfV4?si=...
   static const String _videoId = '9nXHHtalfV4';
-
   late final YoutubePlayerController _yt;
   bool _keepAwake = true;
 
   @override
   void initState() {
     super.initState();
-
-    // Keep screen on while watching
     WakelockPlus.enable();
-
     _yt = YoutubePlayerController.fromVideoId(
       videoId: _videoId,
       autoPlay: true,
       params: const YoutubePlayerParams(
-        // Keep the UI minimal but usable
         showControls: true,
         showFullscreenButton: true,
-        enableCaption: false,
-        // Only related from same channel when YT shows suggestions
+        enableCaption: true,
         strictRelatedVideos: true,
-        // Smooth inline playback on mobile
         playsInline: true,
-        // Uses youtube-nocookie.com where supported
-        // privacyEnhanced: true,
-        // Optional: set your preferred interface language
         interfaceLanguage: 'en',
       ),
     );
@@ -91,7 +87,17 @@ class _LivePageState extends State<LivePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Zad TV — Live'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.live_tv, color: Colors.redAccent),
+            const SizedBox(width: 8),
+            Text(
+              'Zad TV — Live',
+              style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
         centerTitle: true,
         actions: [
           IconButton(
@@ -108,13 +114,29 @@ class _LivePageState extends State<LivePage> {
         ],
       ),
       body: Center(
-        child: AspectRatio(
-          aspectRatio: 16 / 9,
-          // The IFrame player (no YouTube feed, comments, or recommendations UI)
-          child: YoutubePlayer(controller: _yt),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: YoutubePlayer(controller: _yt),
+            ),
+          ),
         ),
       ),
-      bottomNavigationBar: const SizedBox(height: 16),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(12),
+        color: const Color.fromARGB(255, 5, 3, 143),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.circle, size: 10, color: Colors.redAccent),
+            const SizedBox(width: 6),
+            Text('Live on Zad TV', style: GoogleFonts.openSans(fontSize: 14)),
+          ],
+        ),
+      ),
     );
   }
 }
